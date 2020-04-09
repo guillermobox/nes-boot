@@ -1,8 +1,8 @@
 boot.nes: prg.bin chr.bin assemble
 	./assemble -p prg.bin -c chr.bin -o boot.nes
 
-prg.bin:
-	truncate -s 32768 prg.bin
+prg.bin: boot.s boot.cfg
+	cl65 --config boot.cfg boot.s -o prg.bin
 
 chr.bin:
 	truncate -s 16384 chr.bin

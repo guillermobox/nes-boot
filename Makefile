@@ -1,3 +1,10 @@
+.PHONY: clean all
+
+all: boot.nes
+
+clean:
+	rm -f *.bin *.nes *.o assemble
+
 boot.nes: prg.bin chr.bin assemble
 	./assemble -p prg.bin -c chr.bin -o boot.nes
 

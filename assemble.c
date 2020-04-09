@@ -64,6 +64,6 @@ int main(int argc, char *argv[])
 	FILE * f = fopen(output, "wb");
 	fwrite(&header, sizeof(header), 1, f);
 	insert_file(prg, 0x8000, f);
-	insert_file(chr, 0x4000, f);
+	insert_file(chr, 0x2000, f);
 	fclose(f);
 }

@@ -1,3 +1,9 @@
+APU_WA1 = $4000
+APU_WA2 = $4004
+APU_TRI = $4008
+APU_NOI = $400C
+APU_STATUS = $4015
+APU_FRAME  = $4017
 PPUCONTROL = $2000
 PPUMASK    = $2001
 PPUSTATUS  = $2002
@@ -83,8 +89,30 @@ reset:
 	inx
 	bne @clrmem
 
-    ; Other things you can do between vblank waits are set up audio
-    ; or set up other mapper registers.
+init_apu:
+        ; Init $4000-4013
+	ldy #$13
+@loop:  lda audioregs,y
+	sta $4000,y
+	dey
+	bpl @loop
+
+	; We have to skip over $4014 (OAMDMA)
+	lda #$0f
+	sta $4015
+	lda #$40
+	sta $4017
+
+	; beep
+	lda #<179
+	sta $4002
+	lda #>179
+	and #$07
+	ora #%10100000
+	sta $4003
+	lda #%10011111
+	sta $4000
+
 
 @vblankwait2:
 	bit PPUSTATUS
@@ -151,6 +179,12 @@ wback:
 	brk
 
 msg:       .asciiz "nintendo"
+audioregs:
+        .byte $30,$08,$00,$00
+        .byte $30,$08,$00,$00
+        .byte $80,$00,$00,$00
+        .byte $30,$00,$00,$00
+        .byte $00,$00,$00,$00
 
 .segment "VECTORS"
 	.addr nmi

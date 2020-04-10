@@ -10,8 +10,12 @@ PPUSTATUS  = $2002
 PPUADDR    = $2006
 PPUDATA    = $2007
 
+INPUT_1 = $4016
+INPUT_2 = $4017
+
 frame = $00
 pages = $01
+input = $03
 
 .segment "CODE"
 nmi:
@@ -20,6 +24,40 @@ nmi:
 
 	; vblank starts here
 	inc frame
+	lda #$00
+	sta input
+
+	; latch input
+	lda #$01
+	sta INPUT_1
+	; de-latch input
+	lda #$00
+	sta INPUT_1
+
+	ldx #$08
+next_input:
+	lda INPUT_1
+	lsr a
+	rol input
+	dex
+	bne next_input
+
+; controled read
+
+; show controler byte
+	lda #$22
+	sta PPUADDR
+	lda #$2c
+	sta PPUADDR
+	lda input
+	lsr
+	lsr
+	lsr
+	lsr
+	sta PPUDATA
+	lda input
+	and #$0F
+	sta PPUDATA
 
 	lda #$0e
 	sta PPUMASK
